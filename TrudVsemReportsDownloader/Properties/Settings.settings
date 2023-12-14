@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TrudVsemReportsDownloader.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="_link" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://opendata.trudvsem.ru/csv/vacancy_9.csv</Value>
+    </Setting>
+    <Setting Name="_resultsFilename" Type="System.String" Scope="User">
+      <Value Profile="(Default)">vacancy_9_result.csv</Value>
+    </Setting>
+    <Setting Name="_destinationFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F:\загрузки\</Value>
+    </Setting>
+    <Setting Name="_csvDelimiter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">|</Value>
+    </Setting>
+    <Setting Name="_filterColumn" Type="System.String" Scope="User">
+      <Value Profile="(Default)">state_region_code</Value>
+    </Setting>
+    <Setting Name="_filterValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)">3100000000000</Value>
+    </Setting>
+    <Setting Name="_resultsFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F:\загрузки\</Value>
+    </Setting>
+    <Setting Name="_deletedColumns" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

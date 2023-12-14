@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrudVsemReportsDownloader", "TrudVsemReportsDownloader\TrudVsemReportsDownloader.csproj", "{DB4EDA1C-3E6A-4516-B7B3-CDA3639B6FE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB4EDA1C-3E6A-4516-B7B3-CDA3639B6FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB4EDA1C-3E6A-4516-B7B3-CDA3639B6FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB4EDA1C-3E6A-4516-B7B3-CDA3639B6FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB4EDA1C-3E6A-4516-B7B3-CDA3639B6FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22B40AE4-2A86-4626-8946-B8808A6AFC57}
+	EndGlobalSection
+EndGlobal

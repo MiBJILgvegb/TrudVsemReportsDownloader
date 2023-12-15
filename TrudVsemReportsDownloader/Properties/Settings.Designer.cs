@@ -37,7 +37,7 @@ namespace TrudVsemReportsDownloader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("vacancy_9_result.csv")]
+        [global::System.Configuration.DefaultSettingValueAttribute("vacancy_9_result.xlsx")]
         public string _resultsFilename {
             get {
                 return ((string)(this["_resultsFilename"]));
@@ -107,15 +107,54 @@ namespace TrudVsemReportsDownloader.Properties {
             }
         }
         
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("full_company_name,vacancy_name,work_places,vacancy_address,salary,salary_max,educ" +
+            "ation,position_responsibilities,position_requirements,busy_type,company_inn")]
+        public string _resultedColumns {
+            get {
+                return ((string)(this["_resultedColumns"]));
+            }
+        }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string _deletedColumns {
+        public string _companyesInn {
             get {
-                return ((string)(this["_deletedColumns"]));
+                return ((string)(this["_companyesInn"]));
             }
             set {
-                this["_deletedColumns"] = value;
+                this["_companyesInn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Наименование организации,Профессия,Количество свободных раб.мест,Адрес,Заработная" +
+            " плата от,Заработная плата до,Образование,Должностные обязанности,Требования,Зан" +
+            "ятость,ИНН")]
+        public string _defaultRow {
+            get {
+                return ((string)(this["_defaultRow"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(";")]
+        public string _defaultXLSDelimiter {
+            get {
+                return ((string)(this["_defaultXLSDelimiter"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("company_inn")]
+        public string _innColumnName {
+            get {
+                return ((string)(this["_innColumnName"]));
             }
         }
     }

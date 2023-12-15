@@ -4,16 +4,10 @@ using System.Windows.Forms;
 using System.Net;
 using System.IO;
 using System.Threading;
-using System.Net.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.VisualBasic.FileIO;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Diagnostics;
-using System.Reflection;
-using Microsoft.VisualBasic;
-using System.Net.NetworkInformation;
-using static System.Windows.Forms.LinkLabel;
+using Excel = Microsoft.Office.Interop.Excel;
 using System.Linq;
 
 namespace TrudVsemReportsDownloader
@@ -30,10 +24,13 @@ namespace TrudVsemReportsDownloader
         private string _destinationFolder;
         private string _resultsFolder;
         private string _filterColumn;
-        private string _deletedColumns;
+        private string _resultedColumns;
         private string _filterValue;
+        private string _defaultRow;
+        private string _defaultXLSDelimiter;
+        private string _innColumnName;
+        private long[] _companyesInn;
         private int _filterColumnPos = 0;
-        private int[] deletedColumns = null;
         public MainWindow()
         {
             mainWindow = this;
@@ -43,7 +40,7 @@ namespace TrudVsemReportsDownloader
         private void InitializeSettings()
         {
             PresetDefaulVariables();
-            if (!CheckFolderExists(_destinationFolder))
+            if ((!CheckFolderExists(_destinationFolder))||(_companyesInn==null))
             {
                 tsmiSettings_Click(null,null);
             }
@@ -62,8 +59,22 @@ namespace TrudVsemReportsDownloader
             _destinationFolder = Properties.Settings.Default._destinationFolder;
             _resultsFolder = Properties.Settings.Default._resultsFolder;
             _filterColumn = Properties.Settings.Default._filterColumn;
-            _deletedColumns = Properties.Settings.Default._deletedColumns;
+            _resultedColumns = Properties.Settings.Default._resultedColumns;
             _filterValue = Properties.Settings.Default._filterValue;
+            _defaultRow = Properties.Settings.Default._defaultRow;
+            _defaultXLSDelimiter = Properties.Settings.Default._defaultXLSDelimiter;
+            _innColumnName = Properties.Settings.Default._innColumnName;
+            _companyesInn = null;
+            if (Properties.Settings.Default._companyesInn.Length > 0)
+            {
+                string[] temp = Properties.Settings.Default._companyesInn.Split(',');
+                _companyesInn = new long[temp.Length];
+                int i = 0;
+                foreach (string s in temp)
+                {
+                    _companyesInn[i++] = Convert.ToInt64(s);
+                }
+            }
         }
         private long GetFreeSpace(string drive)
         {
@@ -124,10 +135,6 @@ namespace TrudVsemReportsDownloader
             MessageBox.Show(message);
         }
         //----------------------------------------------------------------------------------------------------------------------------------
-        private string FieldsToString(string[] fields)
-        {
-            return string.Join(_csvDelimiter, fields);
-        }
         private long GetCSVSize(string csv)
         {
             UpdateStatusAsync(0, $@"Чтение файла");
@@ -144,32 +151,183 @@ namespace TrudVsemReportsDownloader
             if (fields[_filterColumnPos] != _filterValue) return false;
             return true;
         }
-        private int[] GetDeletedColumnsPos(string[] columns)
+        private int[] GetColumnsOrder(string[] columns, string[] order)
         {
-            string[] deletedColumns = _deletedColumns.Split(',');
-            int[] pos = new int[deletedColumns.Length];
-            int i = 0;
-            foreach (string deletedColumn in deletedColumns)
+            int[] newOrder= new int[order.Length];
+
+            for(int i=0; i < columns.Length; i++)
             {
-                pos[i++]=Array.IndexOf(columns, deletedColumn);
-            }
-            return pos;
-        }
-        private string[] DeleteColumns(string[] columns)
-        {
-            string[] ret=new string[columns.Length-deletedColumns.Length];
-            for (int i = 0, j = 0; i < columns.Length; i++)
-            {
-                if (!deletedColumns.Contains(i))
+                if (order.Contains(columns[i]))
                 {
-                    ret[j++] = columns[i];
+                    newOrder[Array.IndexOf(order, columns[i])] = i;
                 }
             }
-            return ret;
+
+            return newOrder;
         }
-        private void SaveToFile(StreamWriter w, string[] fields)
+        private string[] ConvertFieldsToNewOrder(string[] fields, int[] order)
         {
-            w.WriteLine(FieldsToString(DeleteColumns(fields)));
+            if (order == null) return null;
+            string[] newFields = new string[order.Length];
+            for (int i = 0; i < newFields.Length; i++)
+            {
+                newFields[i]= fields[order[i]];
+            }
+            return newFields;
+        }
+        private async Task CreateTempCSV(string csv,string resultFile)
+        {
+            using (var parser = new TextFieldParser(csv))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(_csvDelimiter);
+                long csvSize = GetCSVSize(csv);
+
+                int i = 0;
+                int filtredRows = 0;
+                int progress = -1;
+                int oldProgress;
+
+                using (var w = new StreamWriter(resultFile))
+                {
+                    InitInfoLabelAsync(lInfo1);
+                    ShowInfoAsync(lInfo1, $@"Всего строк в файле {csvSize}");
+
+                    InitInfoLabelAsync(lInfo2);
+                    InitInfoLabelAsync(lInfo3);
+                    ShowInfoAsync(lInfo2, "");
+                    ShowInfoAsync(lInfo3, "");
+
+                    while (!parser.EndOfData)
+                    {
+                        string[] fields = parser.ReadFields();
+                        if (i == 0)
+                        {
+                            //обработка строки заголовков
+                            _filterColumnPos = GetFilterColumnPosition(fields);
+                            w.WriteLine(string.Join(_csvDelimiter, fields));
+                        }
+                        else
+                        {
+                            if (await CheckCSVField(fields))
+                            {
+                                w.WriteLine(string.Join(_csvDelimiter, fields));
+                                ShowInfoAsync(lInfo3, $@"Найдено подходящих строк {++filtredRows}");
+                            }
+                        }
+                        i++;
+                        ShowInfoAsync(lInfo2, $@"Обрабатываемая строка {i}/{csvSize}");
+                        w.FlushAsync().Wait();
+
+                        oldProgress = progress;
+                        progress = (int)(i * 100 / csvSize);
+                        // так как значение от 0 до 100, нет особого смысла повторно обновлять интерфейс, если значение не изменилось.
+                        if (oldProgress != progress)
+                        {
+                            UpdateStatusAsync(progress, $@"Обработка файла {progress}%");
+                        }
+                    }
+                }
+                //InitInfoLabelAsync(lInfo1, false);
+                ShowInfoAsync(lInfo2, $@"Всего найдено {filtredRows} строк удовлетворяющих условиям.");
+                InitInfoLabelAsync(lInfo2, false);
+                InitInfoLabelAsync(lInfo3, false);
+            }
+        }
+        private async Task ConvertToXLSX(string csv, string resultXLSX)
+        {
+            using (var parser = new TextFieldParser(csv))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.HasFieldsEnclosedInQuotes = false;
+                parser.SetDelimiters(_csvDelimiter);
+                long csvSize = GetCSVSize(csv);
+
+                int i = 0;
+                int filtredRows = 0;
+                int progress = -1;
+                int oldProgress;
+
+                Excel.Application excel = new Excel.Application();
+                excel.SheetsInNewWorkbook = 1;
+                Excel.Workbook workBook = excel.Workbooks.Add(Type.Missing);
+                excel.DisplayAlerts = false;
+                Excel.Worksheet sheet = (Excel.Worksheet)excel.Worksheets.get_Item(1);
+                sheet.Name = "Вакансии";
+
+                InitInfoLabelAsync(lInfo1);
+                ShowInfoAsync(lInfo1, $@"Всего строк в файле {csvSize}");
+
+                InitInfoLabelAsync(lInfo2);
+                InitInfoLabelAsync(lInfo3);
+                ShowInfoAsync(lInfo2, "");
+                ShowInfoAsync(lInfo3, "");
+
+                string[] _defRow = _defaultRow.Split(',');
+
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Value2 = _defRow;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Cells.Font.Bold=true;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].Weight = Excel.XlBorderWeight.xlThin;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].LineStyle = Excel.XlLineStyle.xlContinuous;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].ColorIndex = 0;
+
+
+                _defRow = null;
+
+                int[] columnsOrder = null;
+                int columnINN = -1;
+                int j = 2;
+
+                while (!parser.EndOfData)
+                {
+                    string[] fields = null;
+                    try
+                    {
+                        fields = parser.ReadFields();
+                    }
+                    catch (MalformedLineException e) { UpdateStatusAsync(progress, $@"Ошибка чтения файла {e.Message}"); }
+                    if (i == 0)
+                    {
+                        columnsOrder = GetColumnsOrder(fields, _resultedColumns.Split(','));
+                        columnINN = Array.IndexOf(fields, _innColumnName);
+                    }
+                    else
+                    {
+                        if ((columnINN != -1) & (_companyesInn.Contains(Convert.ToInt64(fields[columnINN]))))
+                        {
+                            string[] newFields = ConvertFieldsToNewOrder(fields, columnsOrder);
+                            SaveToXLS(newFields, ref sheet, j++, 1);
+                            //w.WriteLine(string.Join(_defaultXLSDelimiter, newFields));
+                        }
+                    }
+
+                    i++;
+                    ShowInfoAsync(lInfo2, $@"Обрабатываемая строка {i}/{csvSize}");
+                    //w.FlushAsync().Wait();
+
+                    oldProgress = progress;
+                    progress = (int)(i * 100 / csvSize);
+                    // так как значение от 0 до 100, нет особого смысла повторно обновлять интерфейс, если значение не изменилось.
+                    if (oldProgress != progress)
+                    {
+                        UpdateStatusAsync(progress, $@"Обработка файла {progress}%");
+                    }
+                }
+
+                //InitInfoLabelAsync(lInfo1, false);
+                ShowInfoAsync(lInfo2, $@"Всего найдено {filtredRows} строк удовлетворяющих условиям.");
+                InitInfoLabelAsync(lInfo2, false);
+                InitInfoLabelAsync(lInfo3, false);
+
+                excel.Application.ActiveWorkbook.SaveAs(resultXLSX);
+                excel.Application.ActiveWorkbook.Close();
+            }
+        }
+        private void SaveToXLS(string[] fields,ref Excel.Worksheet sheet,int startRow,int startCol)
+        {
+            sheet.Range[sheet.Cells[startRow,startCol], sheet.Cells[startRow, startCol+ fields.Length-1]].Value2= fields;
         }
         //----------------------------------------------------------------------------------------------------------------------------------
         private async Task DownloadFileAsync(string url, string path, IProgress<int> status, CancellationToken token)
@@ -210,72 +368,13 @@ namespace TrudVsemReportsDownloader
         }
         private async Task ParseCSV(string csv,string resultFile)
         {
-            if (File.Exists(resultFile)) { File.Delete(resultFile); }
-            using (var parser = new TextFieldParser(csv))
-            {
-                parser.TextFieldType = FieldType.Delimited;
-                parser.SetDelimiters(_csvDelimiter);
-                
-                long csvSize = GetCSVSize(csv);
-                InitInfoLabelAsync(lInfo1);
-                ShowInfoAsync(lInfo1, $@"Всего строк в файле {csvSize}");
-                
-                int i = 0;
-                int filtredRows = 0;
-                int progress = -1;
-                int oldProgress;
-                using (var w = new StreamWriter(resultFile))
-                {
-                    InitInfoLabelAsync(lInfo2);
-                    InitInfoLabelAsync(lInfo3);
-                    ShowInfoAsync(lInfo2, "");
-                    ShowInfoAsync(lInfo3, "");
-                    
-                    while (!parser.EndOfData)
-                    {
-                        string[] fields = parser.ReadFields();
-                        if ((deletedColumns == null) && (_deletedColumns.Length>0))
-                        {
-                            deletedColumns = GetDeletedColumnsPos(fields);
-                        }
-                        //if(deletedColumnsPos!=null) fields = DeletColumns(fields, deletedColumnsPos);
-                        if (i == 0)
-                        {
-                            //обработка строки заголовков
-                            _filterColumnPos = GetFilterColumnPosition(fields);
-                            SaveToFile(w, fields);
-                            //w.WriteLine(FieldsToString(fields));
-                        }
-                        else
-                        {
-                            if (await CheckCSVField(fields))
-                            {
-                                SaveToFile(w, fields);
-                                //w.WriteLine(FieldsToString(fields));
-                                ShowInfoAsync(lInfo3, $@"Найдено подходящих строк {++filtredRows}");
-                            }
-                        }
-                        i++;
-                        ShowInfoAsync(lInfo2, $@"Обрабатываемая строка {i}/{csvSize}");
-                        w.FlushAsync().Wait();
+            //if (File.Exists(resultFile)) { File.Delete(resultFile); }
+            //await CreateTempCSV(csv, Path.Combine(_resultsFolder, "temp.csv"));
+            await ConvertToXLSX(Path.Combine(_resultsFolder, "temp.csv"), resultFile);
+ 
+            //ResultMessage($@"Обработка файла завершена.{Environment.NewLine}Всего найдено {filtredRows} строк удовлетворяющих условиям.");
 
-                        oldProgress = progress;
-                        progress = (int)(i * 100 / csvSize);
-                        // так как значение от 0 до 100, нет особого смысла повторно обновлять интерфейс, если значение не изменилось.
-                        if (oldProgress != progress)
-                        {
-                            UpdateStatusAsync(progress, $@"Обработка файла {progress}%");
-                        }
-                    }
-                }
-                InitInfoLabelAsync(lInfo1,false);
-                InitInfoLabelAsync(lInfo2,false);
-                InitInfoLabelAsync(lInfo3,false);
-
-                ResultMessage($@"Обработка файла завершена.{Environment.NewLine}Всего найдено {filtredRows} строк удовлетворяющих условиям.");
-
-                Process.Start(Path.GetFullPath(resultFile));
-            }
+            //Process.Start(Path.GetFullPath(resultFile));
         }
         //----------------------------------------------------------------------------------------------------------------------------------
         private async void bDownload_Click(object sender, EventArgs e)

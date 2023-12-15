@@ -6,7 +6,7 @@
       <Value Profile="(Default)">https://opendata.trudvsem.ru/csv/vacancy_9.csv</Value>
     </Setting>
     <Setting Name="_resultsFilename" Type="System.String" Scope="User">
-      <Value Profile="(Default)">vacancy_9_result.csv</Value>
+      <Value Profile="(Default)">vacancy_9_result.xlsx</Value>
     </Setting>
     <Setting Name="_destinationFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">F:\загрузки\</Value>
@@ -23,8 +23,20 @@
     <Setting Name="_resultsFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">F:\загрузки\</Value>
     </Setting>
-    <Setting Name="_deletedColumns" Type="System.String" Scope="User">
+    <Setting Name="_resultedColumns" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">full_company_name,vacancy_name,work_places,vacancy_address,salary,salary_max,education,position_responsibilities,position_requirements,busy_type,company_inn</Value>
+    </Setting>
+    <Setting Name="_companyesInn" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="_defaultRow" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Наименование организации,Профессия,Количество свободных раб.мест,Адрес,Заработная плата от,Заработная плата до,Образование,Должностные обязанности,Требования,Занятость,ИНН</Value>
+    </Setting>
+    <Setting Name="_defaultXLSDelimiter" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">;</Value>
+    </Setting>
+    <Setting Name="_innColumnName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">company_inn</Value>
     </Setting>
   </Settings>
 </SettingsFile>

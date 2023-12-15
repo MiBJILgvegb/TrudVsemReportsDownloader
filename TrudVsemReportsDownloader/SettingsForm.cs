@@ -20,12 +20,12 @@ namespace TrudVsemReportsDownloader
         //----------------------------------------------------------------------------------------------------------------------------------
         private void SaveInfo()
         {
-            if ((tbDownloadFolderPath.Text.Length>0)&(tbDownloadFolderPath.Text.Substring(tbDownloadFolderPath.Text.Length - 2) == "\\"))
+            if ((tbDownloadFolderPath.Text.Length>0)&(tbDownloadFolderPath.Text.Substring(tbDownloadFolderPath.Text.Length - 1) == "\\"))
             {
                 Properties.Settings.Default._destinationFolder = tbDownloadFolderPath.Text;
             }
             else { Properties.Settings.Default._destinationFolder = tbDownloadFolderPath.Text+"\\"; }
-            if ((tbResultsFolderPath.Text.Length>0)&(tbResultsFolderPath.Text.Substring(tbResultsFolderPath.Text.Length - 2) == "\\"))
+            if ((tbResultsFolderPath.Text.Length>0)&(tbResultsFolderPath.Text.Substring(tbResultsFolderPath.Text.Length - 1) == "\\"))
             {
                 Properties.Settings.Default._resultsFolder = tbResultsFolderPath.Text;
             }
@@ -46,9 +46,9 @@ namespace TrudVsemReportsDownloader
             {
                 Properties.Settings.Default._csvDelimiter= tbCSVDelimiter.Text;
             }
-            if (tbDeletedFields.Text.Length > 0)
+            if (tbINNList.Text.Length > 0)
             {
-                Properties.Settings.Default._deletedColumns = tbDeletedFields.Text;
+                Properties.Settings.Default._companyesInn = tbINNList.Text;
             }
             if (tbFilterValue.Text.Length > 0)
             {
@@ -83,7 +83,7 @@ namespace TrudVsemReportsDownloader
             tbResultsFilename.Text = Properties.Settings.Default._resultsFilename;
             tbCSVDelimiter.Text = Properties.Settings.Default._csvDelimiter;
             tbFilterField.Text = Properties.Settings.Default._filterColumn;
-            tbDeletedFields.Text = Properties.Settings.Default._deletedColumns;
+            tbINNList.Text = Properties.Settings.Default._companyesInn;
             tbFilterValue.Text = Properties.Settings.Default._filterValue;
         }
         private void bExit_Click(object sender, EventArgs e)

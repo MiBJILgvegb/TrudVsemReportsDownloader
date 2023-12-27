@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.tsmiSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.переменныеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.флагиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.pbStatus = new System.Windows.Forms.ProgressBar();
             this.bDownload = new System.Windows.Forms.Button();
@@ -39,8 +41,6 @@
             this.lInfo1 = new System.Windows.Forms.Label();
             this.lInfo2 = new System.Windows.Forms.Label();
             this.lInfo3 = new System.Windows.Forms.Label();
-            this.переменныеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.флагиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,6 +64,18 @@
             this.tsmiSettings.Size = new System.Drawing.Size(79, 20);
             this.tsmiSettings.Text = "Настройки";
             this.tsmiSettings.Click += new System.EventHandler(this.tsmiSettings_Click);
+            // 
+            // переменныеToolStripMenuItem
+            // 
+            this.переменныеToolStripMenuItem.Name = "переменныеToolStripMenuItem";
+            this.переменныеToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.переменныеToolStripMenuItem.Text = "Переменные";
+            // 
+            // флагиToolStripMenuItem
+            // 
+            this.флагиToolStripMenuItem.Name = "флагиToolStripMenuItem";
+            this.флагиToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.флагиToolStripMenuItem.Text = "Флаги";
             // 
             // tsmiExit
             // 
@@ -110,7 +122,7 @@
             this.bParse.Name = "bParse";
             this.bParse.Size = new System.Drawing.Size(75, 23);
             this.bParse.TabIndex = 4;
-            this.bParse.Text = "Парсинг";
+            this.bParse.Text = "Свод";
             this.bParse.UseVisualStyleBackColor = true;
             this.bParse.Click += new System.EventHandler(this.bParse_Click);
             // 
@@ -143,18 +155,6 @@
             this.lInfo3.TabIndex = 7;
             this.lInfo3.Text = "label1";
             this.lInfo3.Visible = false;
-            // 
-            // переменныеToolStripMenuItem
-            // 
-            this.переменныеToolStripMenuItem.Name = "переменныеToolStripMenuItem";
-            this.переменныеToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.переменныеToolStripMenuItem.Text = "Переменные";
-            // 
-            // флагиToolStripMenuItem
-            // 
-            this.флагиToolStripMenuItem.Name = "флагиToolStripMenuItem";
-            this.флагиToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.флагиToolStripMenuItem.Text = "Флаги";
             // 
             // MainWindow
             // 

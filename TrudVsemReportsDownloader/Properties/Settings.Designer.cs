@@ -134,9 +134,9 @@ namespace TrudVsemReportsDownloader.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("Наименование организации,Профессия,Количество свободных раб.мест,Адрес,Заработная" +
             " плата от,Заработная плата до,Образование,Должностные обязанности,Требования,Зан" +
             "ятость,ИНН")]
-        public string _defaultRow {
+        public string _defaultHeaderRow {
             get {
-                return ((string)(this["_defaultRow"]));
+                return ((string)(this["_defaultHeaderRow"]));
             }
         }
         
@@ -155,6 +155,27 @@ namespace TrudVsemReportsDownloader.Properties {
         public string _innColumnName {
             get {
                 return ((string)(this["_innColumnName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("23,22,15,24,11,11,15,24,23,18,15")]
+        public string _defaultResultColWidth {
+            get {
+                return ((string)(this["_defaultResultColWidth"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool _resultFilenameAppendDate {
+            get {
+                return ((bool)(this["_resultFilenameAppendDate"]));
+            }
+            set {
+                this["_resultFilenameAppendDate"] = value;
             }
         }
     }

@@ -29,7 +29,7 @@
     <Setting Name="_companyesInn" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="_defaultRow" Type="System.String" Scope="Application">
+    <Setting Name="_defaultHeaderRow" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Наименование организации,Профессия,Количество свободных раб.мест,Адрес,Заработная плата от,Заработная плата до,Образование,Должностные обязанности,Требования,Занятость,ИНН</Value>
     </Setting>
     <Setting Name="_defaultXLSDelimiter" Type="System.String" Scope="Application">
@@ -37,6 +37,12 @@
     </Setting>
     <Setting Name="_innColumnName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">company_inn</Value>
+    </Setting>
+    <Setting Name="_defaultResultColWidth" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">23,22,15,24,11,11,15,24,23,18,15</Value>
+    </Setting>
+    <Setting Name="_resultFilenameAppendDate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

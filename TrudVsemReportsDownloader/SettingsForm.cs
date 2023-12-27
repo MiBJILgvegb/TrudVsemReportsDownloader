@@ -54,6 +54,7 @@ namespace TrudVsemReportsDownloader
             {
                 Properties.Settings.Default._csvDelimiter= tbCSVDelimiter.Text;
             }
+            Properties.Settings.Default._resultFilenameAppendDate = cbAppendDate.Checked;
 
             Properties.Settings.Default.Save();
         }
@@ -85,6 +86,7 @@ namespace TrudVsemReportsDownloader
             tbFilterField.Text = Properties.Settings.Default._filterColumn;
             tbINNList.Text = Properties.Settings.Default._companyesInn;
             tbFilterValue.Text = Properties.Settings.Default._filterValue;
+            cbAppendDate.Checked = Properties.Settings.Default._resultFilenameAppendDate;
         }
         private void bExit_Click(object sender, EventArgs e)
         {

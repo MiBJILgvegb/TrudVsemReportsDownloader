@@ -26,11 +26,13 @@ namespace TrudVsemReportsDownloader
         private string _filterColumn;
         private string _resultedColumns;
         private string _filterValue;
-        private string _defaultRow;
+        private string[] _defaultHeaderRow;
         private string _defaultXLSDelimiter;
         private string _innColumnName;
         private long[] _companyesInn;
         private int _filterColumnPos = 0;
+        private int[] _resultColWidth;
+        private bool _resultsFilenameAppendDate;
         public MainWindow()
         {
             mainWindow = this;
@@ -56,14 +58,23 @@ namespace TrudVsemReportsDownloader
             _link = Properties.Settings.Default._link;
             _downloadFilename = Path.GetFileName(Properties.Settings.Default._link);
             _resultsFilename = Properties.Settings.Default._resultsFilename;
+            _resultsFilenameAppendDate = Properties.Settings.Default._resultFilenameAppendDate;
+            if (_resultsFilenameAppendDate)
+            {
+                string ext=Path.GetExtension(Properties.Settings.Default._resultsFilename);
+                string name=Path.GetFileNameWithoutExtension(Properties.Settings.Default._resultsFilename);
+
+                _resultsFilename = string.Concat(name," ", DateTime.Now.ToShortDateString(), ext);
+            }
             _destinationFolder = Properties.Settings.Default._destinationFolder;
             _resultsFolder = Properties.Settings.Default._resultsFolder;
             _filterColumn = Properties.Settings.Default._filterColumn;
             _resultedColumns = Properties.Settings.Default._resultedColumns;
             _filterValue = Properties.Settings.Default._filterValue;
-            _defaultRow = Properties.Settings.Default._defaultRow;
+            _defaultHeaderRow = Properties.Settings.Default._defaultHeaderRow.Split(',');
             _defaultXLSDelimiter = Properties.Settings.Default._defaultXLSDelimiter;
             _innColumnName = Properties.Settings.Default._innColumnName;
+            _resultsFilenameAppendDate = Properties.Settings.Default._resultFilenameAppendDate;
             _companyesInn = null;
             if (Properties.Settings.Default._companyesInn.Length > 0)
             {
@@ -73,6 +84,17 @@ namespace TrudVsemReportsDownloader
                 foreach (string s in temp)
                 {
                     _companyesInn[i++] = Convert.ToInt64(s);
+                }
+            }
+            _resultColWidth = null;
+            if (Properties.Settings.Default._defaultResultColWidth.Length > 0)
+            {
+                string[] temp = Properties.Settings.Default._defaultResultColWidth.Split(',');
+                _resultColWidth = new int[temp.Length];
+                int i = 0;
+                foreach (string s in temp)
+                {
+                    _resultColWidth[i++] = Convert.ToInt32(s);
                 }
             }
         }
@@ -244,7 +266,7 @@ namespace TrudVsemReportsDownloader
                 long csvSize = GetCSVSize(csv);
 
                 int i = 0;
-                int filtredRows = 0;
+                
                 int progress = -1;
                 int oldProgress;
 
@@ -254,6 +276,11 @@ namespace TrudVsemReportsDownloader
                 excel.DisplayAlerts = false;
                 Excel.Worksheet sheet = (Excel.Worksheet)excel.Worksheets.get_Item(1);
                 sheet.Name = "Вакансии";
+                //заполняем первую строку
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defaultHeaderRow.Length]].Value2 = _defaultHeaderRow;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defaultHeaderRow.Length]].Cells.Font.Bold = true;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defaultHeaderRow.Length]].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defaultHeaderRow.Length]].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
                 InitInfoLabelAsync(lInfo1);
                 ShowInfoAsync(lInfo1, $@"Всего строк в файле {csvSize}");
@@ -263,22 +290,9 @@ namespace TrudVsemReportsDownloader
                 ShowInfoAsync(lInfo2, "");
                 ShowInfoAsync(lInfo3, "");
 
-                string[] _defRow = _defaultRow.Split(',');
-
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Value2 = _defRow;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Cells.Font.Bold=true;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].Weight = Excel.XlBorderWeight.xlThin;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].LineStyle = Excel.XlLineStyle.xlContinuous;
-                sheet.Range[sheet.Cells[1, 1], sheet.Cells[1, _defRow.Length]].Borders[Excel.XlBordersIndex.xlInsideVertical].ColorIndex = 0;
-
-
-                _defRow = null;
-
                 int[] columnsOrder = null;
                 int columnINN = -1;
-                int j = 2;
+                int filtredRows = 2;
 
                 while (!parser.EndOfData)
                 {
@@ -298,7 +312,7 @@ namespace TrudVsemReportsDownloader
                         if ((columnINN != -1) & (_companyesInn.Contains(Convert.ToInt64(fields[columnINN]))))
                         {
                             string[] newFields = ConvertFieldsToNewOrder(fields, columnsOrder);
-                            SaveToXLS(newFields, ref sheet, j++, 1);
+                            SaveToXLS(newFields, ref sheet, filtredRows++, 1);
                             //w.WriteLine(string.Join(_defaultXLSDelimiter, newFields));
                         }
                     }
@@ -314,15 +328,39 @@ namespace TrudVsemReportsDownloader
                     {
                         UpdateStatusAsync(progress, $@"Обработка файла {progress}%");
                     }
+
+                    ShowInfoAsync(lInfo3, $@"Всего найдено {filtredRows} строк.");
                 }
 
-                //InitInfoLabelAsync(lInfo1, false);
-                ShowInfoAsync(lInfo2, $@"Всего найдено {filtredRows} строк удовлетворяющих условиям.");
+                ShowInfoAsync(lInfo1, $@"Всего найдено {filtredRows} строк.");
+
                 InitInfoLabelAsync(lInfo2, false);
                 InitInfoLabelAsync(lInfo3, false);
 
+                UpdateStatusAsync(0,"Форматирование текста...");
+
+                //выставляем ширину столбцов
+                int j = 0;
+                foreach (int k in _resultColWidth){
+                    sheet.Columns[++j].ColumnWidth = k;
+                }
+                //выставляем высоту
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[--filtredRows, _defaultHeaderRow.Length]].EntireRow.AutoFit();
+                //выставляем рамки вокруг таблицы
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].Borders.Weight = Excel.XlBorderWeight.xlThin;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].Borders.ColorIndex = 0;
+                
+                sheet.Range[sheet.Cells[2, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+                sheet.Range[sheet.Cells[2, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
+                //перенос по словам
+                sheet.Range[sheet.Cells[1, 1], sheet.Cells[filtredRows, _defaultHeaderRow.Length]].WrapText = true;
+                //сохраняем
+                UpdateStatusAsync(0, "Сохранение...");
                 excel.Application.ActiveWorkbook.SaveAs(resultXLSX);
                 excel.Application.ActiveWorkbook.Close();
+
+                InitStatusAsync(false, 0);
             }
         }
         private void SaveToXLS(string[] fields,ref Excel.Worksheet sheet,int startRow,int startCol)
@@ -368,11 +406,10 @@ namespace TrudVsemReportsDownloader
         }
         private async Task ParseCSV(string csv,string resultFile)
         {
-            //if (File.Exists(resultFile)) { File.Delete(resultFile); }
-            //await CreateTempCSV(csv, Path.Combine(_resultsFolder, "temp.csv"));
+            if (File.Exists(resultFile)) { File.Delete(resultFile); }
+            await CreateTempCSV(csv, Path.Combine(_resultsFolder, "temp.csv"));
             await ConvertToXLSX(Path.Combine(_resultsFolder, "temp.csv"), resultFile);
- 
-            //ResultMessage($@"Обработка файла завершена.{Environment.NewLine}Всего найдено {filtredRows} строк удовлетворяющих условиям.");
+            File.Delete(Path.Combine(_resultsFolder, "temp.csv"));
 
             //Process.Start(Path.GetFullPath(resultFile));
         }

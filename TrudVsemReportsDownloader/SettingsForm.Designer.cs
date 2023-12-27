@@ -52,6 +52,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.tbINNList = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.cbAppendDate = new System.Windows.Forms.CheckBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -86,7 +88,7 @@
             // bSave
             // 
             this.bSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bSave.Location = new System.Drawing.Point(236, 186);
+            this.bSave.Location = new System.Drawing.Point(236, 201);
             this.bSave.Name = "bSave";
             this.bSave.Size = new System.Drawing.Size(75, 23);
             this.bSave.TabIndex = 31;
@@ -97,7 +99,7 @@
             // bExit
             // 
             this.bExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bExit.Location = new System.Drawing.Point(317, 186);
+            this.bExit.Location = new System.Drawing.Point(317, 201);
             this.bExit.Name = "bExit";
             this.bExit.Size = new System.Drawing.Size(75, 23);
             this.bExit.TabIndex = 30;
@@ -157,7 +159,7 @@
             // 
             this.tbCSVDelimiter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbCSVDelimiter.Location = new System.Drawing.Point(140, 188);
+            this.tbCSVDelimiter.Location = new System.Drawing.Point(140, 208);
             this.tbCSVDelimiter.Name = "tbCSVDelimiter";
             this.tbCSVDelimiter.Size = new System.Drawing.Size(22, 20);
             this.tbCSVDelimiter.TabIndex = 37;
@@ -165,7 +167,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 191);
+            this.label4.Location = new System.Drawing.Point(12, 211);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(73, 13);
             this.label4.TabIndex = 36;
@@ -266,11 +268,31 @@
             this.label8.TabIndex = 46;
             this.label8.Text = "Список ИНН";
             // 
+            // cbAppendDate
+            // 
+            this.cbAppendDate.AutoSize = true;
+            this.cbAppendDate.Location = new System.Drawing.Point(140, 188);
+            this.cbAppendDate.Name = "cbAppendDate";
+            this.cbAppendDate.Size = new System.Drawing.Size(15, 14);
+            this.cbAppendDate.TabIndex = 49;
+            this.cbAppendDate.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(12, 188);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(124, 13);
+            this.label9.TabIndex = 50;
+            this.label9.Text = "Добавить дату в конце";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 221);
+            this.ClientSize = new System.Drawing.Size(404, 236);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.cbAppendDate);
             this.Controls.Add(this.tbINNList);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.bBrowseResultsFolder);
@@ -326,5 +348,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox tbINNList;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckBox cbAppendDate;
+        private System.Windows.Forms.Label label9;
     }
 }

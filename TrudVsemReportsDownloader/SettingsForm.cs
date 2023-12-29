@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,19 +18,36 @@ namespace TrudVsemReportsDownloader
         {
             InitializeComponent();
         }
+        private string AppendDirectorySeparator(string path)
+        {
+            char lastChar = path[path.Length - 1];
+            if (path == null) return path;
+            if (path.IndexOf(Path.DirectorySeparatorChar) > -1)
+            {
+                if (lastChar != Path.DirectorySeparatorChar) { return path + Path.DirectorySeparatorChar; }
+                else return path;
+            }
+            else
+            {
+                if (lastChar != Path.AltDirectorySeparatorChar) { return path + Path.AltDirectorySeparatorChar; }
+                else return path;
+            }
+        }
         //----------------------------------------------------------------------------------------------------------------------------------
         private void SaveInfo()
         {
-            if ((tbDownloadFolderPath.Text.Length>0)&(tbDownloadFolderPath.Text.Substring(tbDownloadFolderPath.Text.Length - 1) == "\\"))
+            if (tbDownloadFolderPath.Text.Length > 0) Properties.Settings.Default._destinationFolder=AppendDirectorySeparator(tbDownloadFolderPath.Text);
+            /*if ((tbDownloadFolderPath.Text.Length>0)&(tbDownloadFolderPath.Text[tbDownloadFolderPath.Text.Length - 1] == Path.DirectorySeparatorChar))
             {
                 Properties.Settings.Default._destinationFolder = tbDownloadFolderPath.Text;
             }
-            else { Properties.Settings.Default._destinationFolder = tbDownloadFolderPath.Text+"\\"; }
-            if ((tbResultsFolderPath.Text.Length>0)&(tbResultsFolderPath.Text.Substring(tbResultsFolderPath.Text.Length - 1) == "\\"))
+            else { Properties.Settings.Default._destinationFolder = tbDownloadFolderPath.Text+ Path.DirectorySeparatorChar; }*/
+            if (tbResultsFolderPath.Text.Length > 0) Properties.Settings.Default._resultsFolder = AppendDirectorySeparator(tbResultsFolderPath.Text);
+            /*if ((tbResultsFolderPath.Text.Length>0)&(tbResultsFolderPath.Text[tbResultsFolderPath.Text.Length - 1] == Path.DirectorySeparatorChar))
             {
                 Properties.Settings.Default._resultsFolder = tbResultsFolderPath.Text;
             }
-            else { Properties.Settings.Default._resultsFolder = tbResultsFolderPath.Text+"\\"; }
+            else { Properties.Settings.Default._resultsFolder = tbResultsFolderPath.Text+ Path.DirectorySeparatorChar; }*/
             if (tbDownloadLink.Text.Length > 0)
             {
                 Properties.Settings.Default._link=tbDownloadLink.Text;

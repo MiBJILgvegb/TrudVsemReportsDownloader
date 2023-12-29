@@ -416,6 +416,7 @@ namespace TrudVsemReportsDownloader
         //----------------------------------------------------------------------------------------------------------------------------------
         private async void bDownload_Click(object sender, EventArgs e)
         {
+            //MessageBox.Show("1");
             if (_cts != null) return;
             if (File.Exists(Path.Combine(_resultsFolder, _downloadFilename))) { File.Delete(Path.Combine(_resultsFolder, _downloadFilename)); }
             using (_cts = new CancellationTokenSource())
